@@ -64,10 +64,10 @@ class BasicAuth(Auth):
             self, user_email: str, user_pwd: str) -> TypeVar('User'):
         """ Returns user object from credentials """
         from models.user import User
-        if not user_email and not isinstance(user_email, str):
+        if not user_email or not isinstance(user_email, str):
             return None
 
-        if not user_pwd and not isinstance(user_pwd, str):
+        if not user_pwd or not isinstance(user_pwd, str):
             return None
 
         users = User.search({"email": user_email})
