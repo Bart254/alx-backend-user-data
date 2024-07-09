@@ -3,7 +3,7 @@
 """
 import re
 from flask import request
-from typing import (List, Optional, TypeVar)
+from typing import (List, TypeVar)
 
 
 class Auth:
@@ -28,7 +28,7 @@ class Auth:
                 return False
         return True
 
-    def authorization_header(self, request=None) -> Optional[str]:
+    def authorization_header(self, request=None) -> str:
         """ validates all requests
 
         Args:
@@ -43,4 +43,5 @@ class Auth:
         return auth_value
 
     def current_user(self, request=None) -> TypeVar('User'):
+        """ returns None """
         return None
