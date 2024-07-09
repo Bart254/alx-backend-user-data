@@ -23,7 +23,10 @@ class Auth:
             return True
 
         for route in excluded_paths:
-            pattern = route + '?'
+            if route.endswith('*'):
+                pattern = route + '.*'
+            else:
+                pattern = route + '?'
             if re.fullmatch(pattern, path):
                 return False
         return True
