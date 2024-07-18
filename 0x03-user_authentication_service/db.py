@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
-from typing import Mapping, Any
+from typing import Dict, Any
 
 from user import Base, User
 
@@ -51,11 +51,10 @@ class DB:
 
         except Exception:
             session.rollback()
-            raise Exception
 
         return new_user
 
-    def find_user_by(self, **kwargs: Mapping[str, Any]) -> User:
+    def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
         """ returns first row of users filtered by keyword args """
         for key, value in kwargs.items():
             if not hasattr(User, key):
