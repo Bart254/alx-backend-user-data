@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""DB class module
+"""DB module
 """
-import bcrypt
 from sqlalchemy import create_engine
-from sqlalchemy.exc import (InvalidRequestError, NoResultFound)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from user import (Base, User)
+
+from user import Base, User
 
 
 class DB:
@@ -24,7 +23,8 @@ class DB:
 
     @property
     def _session(self) -> Session:
-        """Memoized session object"""
+        """Memoized session object
+        """
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
@@ -44,32 +44,3 @@ class DB:
         session.add(user)
         session.commit()
         return user
-
-    def find_user_by(self, **kwargs):
-        """ returns first row of users filtered by keyword args """
-        if len(kwargs) != 1:
-            raise InvalidRequestError
-
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if user is None:
-            raise NoResultFound
-        return user
-
-    def update_user(self, user_id: int, **kwargs) -> None:
-        """ updates a user's attribute
-        Args:
-            user_id(int): id of user to update
-            kwargs(dict): key-word args containing attributes to update
-        """
-        user = self.find_user_by(id=user_id)
-        for key, value in kwargs.items():
-            if hasattr(user, key):
-                setattr(user, key, value)
-            else:
-                raise ValueError
-
-    def _hash_password(self, password: str) -> bytes:
-        """returns salted hash of password"""
-        password_encoded = password.encode()
-        hashed_password = bcrypt.hashpw(password_encoded, bcrypt.gensalt())
-        return hashed_password
