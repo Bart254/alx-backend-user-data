@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-""" DB class module """
+"""DB class module
+"""
 import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import (Base, User)
 
 
 class DB:
-    """DB class"""
+    """DB class
+    """
 
     def __init__(self) -> None:
-        """Initialize a new DB instance"""
+        """Initialize a new DB instance
+        """
         self._engine = create_engine("sqlite:///a.db", echo=True)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
@@ -36,11 +40,10 @@ class DB:
         Returns:
             User(object): a user object created and saved in database
         """
-        user = User()
-        user.email = email
-        user.hashed_password = hashed_password
-        self._session.add(user)
-        self._session.commit()
+        user = User(email=email, hashed_password=hashed_password)
+        session = self._session
+        session.add(user)
+        session.commit()
         return user
 
     def find_user_by(self, **kwargs):
