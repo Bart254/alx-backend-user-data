@@ -6,6 +6,7 @@ import uuid
 from db import DB
 from typing import (TypeVar, Optional)
 from sqlalchemy.orm.exc import NoResultFound
+from user import User
 
 
 def _hash_password(password: str) -> bytes:
@@ -29,7 +30,7 @@ class Auth:
     def __init__(self):
         self._db = DB()
 
-    def register_user(self, email: str, password: str) -> TypeVar('User'):
+    def register_user(self, email: str, password: str) -> User:
         """ saves user to database
         Args:
             email(str): user's email
