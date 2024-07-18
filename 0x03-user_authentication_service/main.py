@@ -86,7 +86,7 @@ def update_password(email: str, reset_token: str, new_password: str) -> None:
     url = 'http://0.0.0.0:5000/reset_password'
     data = {"email": email,
             "reset_token": reset_token,
-            "password": new_password
+            "new_password": new_password
             }
     response = requests.put(url, data=data)
     expected_message = {"email": f"{email}",
