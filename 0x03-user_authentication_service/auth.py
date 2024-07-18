@@ -23,6 +23,11 @@ def _hash_password(password: str) -> bytes:
     return hashed_password
 
 
+def _generate_uuid() -> uuid:
+    """ generates a unique user id """
+    return uuid.uuid4()
+
+
 class Auth:
     """Auth class to interact with the authentication database.
     """
@@ -64,3 +69,14 @@ class Auth:
 
         except Exception:
             return False
+
+    def create_session(self, email: str) -> str:
+        """ creates a session for user """
+        try:
+            user = self._db.find_user_by(email=email)
+            new_session_id = str(_generate_uuid())
+            self._db.update_user(user.id, session_id=new_session_id)
+            return new_session_id
+
+        except NoResultFound:
+            None
