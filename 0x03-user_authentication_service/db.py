@@ -39,8 +39,8 @@ class DB:
         Returns:
             User(object): a user object created and saved in database
         """
-        user = User(email=email, hashed_password=hashed_password)
+        new_user = User(email=email, hashed_password=hashed_password)
         session = self._session
-        session.add(user)
+        session.add(new_user)
         session.commit()
-        return user
+        return new_user
