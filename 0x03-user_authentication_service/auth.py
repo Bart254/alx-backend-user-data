@@ -23,9 +23,9 @@ def _hash_password(password: str) -> bytes:
     return hashed_password
 
 
-def _generate_uuid() -> uuid:
+def _generate_uuid() -> str:
     """ generates a unique user id """
-    return uuid.uuid4()
+    return str(uuid.uuid4())
 
 
 class Auth:
@@ -74,9 +74,47 @@ class Auth:
         """ creates a session for user """
         try:
             user = self._db.find_user_by(email=email)
-            new_session_id = str(_generate_uuid())
+            new_session_id = _generate_uuid()
             self._db.update_user(user.id, session_id=new_session_id)
             return new_session_id
 
         except NoResultFound:
             None
+
+    def get_user_from_session_id(self, session_id: str) -> Optional[User]:
+        """returns user from session_id """
+        if not session_id:
+            return None
+        try:
+            user = self._db.find_user_by(session_id=session_id)
+            return user
+
+        except NoResultFound:
+            return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """ destroy's a user session """
+        self._db.update_user(user_id, session_id=None)
+
+    def get_reset_password_token(self, email: str) -> str:
+        """updates user's reset token"""
+        try:
+            user = self._db.find_user_by(email=email)
+            reset_token = self._generate_uuid()
+            self._db.update_user(user.id, reset_token=reset_token)
+            return reset_token
+
+        except NoResultFound:
+            raise ValueError
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """update's user password"""
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+            password = password.encode()
+            hashed_pw = bcrypt.hashpw(password, bcrypt.gensalt()).decode()
+            self._db.update_user(user.id, hashed_password=hashed_pw,
+                                 reset_token=None)
+
+        except NoResultFound:
+            raise ValueError
