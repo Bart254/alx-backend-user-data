@@ -5,7 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from typing import TypeVar
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
+from typing import Mapping, Any
 
 from user import Base, User
 
@@ -31,7 +33,7 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str) -> TypeVar('User'):
+    def add_user(self, email: str, hashed_password: str) -> User:
         """ saves a user to the database
         Args:
             email(str): user's email
@@ -40,8 +42,25 @@ class DB:
         Returns:
             User(object): a user object created and saved in database
         """
-        new_user = User(email=email, hashed_password=hashed_password)
         session = self._session
-        session.add(new_user)
-        session.commit()
+        new_user = None
+        try:
+            new_user = User(email=email, hashed_password=hashed_password)
+            session.add(new_user)
+            session.commit()
+
+        except Exception:
+            session.rollback()
+
         return new_user
+
+    def find_user_by(self, **kwargs: Mapping[str, Any]) -> User:
+        """ returns first row of users filtered by keyword args """
+        for key, value in kwargs.items():
+            if not hasattr(User, key):
+                raise InvalidRequestError
+
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if user is None:
+            raise NoResultFound
+        return user
