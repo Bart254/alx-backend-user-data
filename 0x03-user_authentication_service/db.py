@@ -43,24 +43,21 @@ class DB:
             User(object): a user object created and saved in database
         """
         session = self._session
-        new_user = None
-        try:
-            new_user = User(email=email, hashed_password=hashed_password)
-            session.add(new_user)
-            session.commit()
-
-        except Exception:
-            session.rollback()
+        new_user = User(email=email, hashed_password=hashed_password)
+        session.add(new_user)
+        session.commit()
 
         return new_user
 
     def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
-        """ returns first row of users filtered by keyword args """
-        for key, value in kwargs.items():
-            if not hasattr(User, key):
-                raise InvalidRequestError
+        """ returns first row of users filtered by keyword args"""
 
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if user is None:
+        try:
+            user = self._session.query(User).filter_by(**kwargs).one()
+            return user
+                
+        except NoResultFound:
             raise NoResultFound
-        return user
+
+        except InvalidRequestError:
+            raise InvalidRequestError
