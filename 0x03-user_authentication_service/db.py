@@ -50,14 +50,12 @@ class DB:
         return new_user
 
     def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
-        """ returns first row of users filtered by keyword args"""
+        """ returns first row of users filtered by keyword args """
+        for key, value in kwargs.items():
+            if not hasattr(User, key):
+                raise InvalidRequestError
 
-        try:
-            user = self._session.query(User).filter_by(**kwargs).one()
-            return user
-                
-        except NoResultFound:
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if user is None:
             raise NoResultFound
-
-        except InvalidRequestError:
-            raise InvalidRequestError
+        return user
