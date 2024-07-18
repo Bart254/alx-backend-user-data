@@ -26,7 +26,6 @@ def session_view():
     if (not user.is_valid_password(password)):
         return jsonify({"error": "wrong password"}), 401
     session_id = auth.create_session(user.id)
-    print(session_id)
     response = jsonify(user.to_json())
     _my_session_id = os.getenv('SESSION_NAME')
     response.set_cookie(_my_session_id, session_id)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """DB module
 """
+import bcrypt
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -68,7 +69,7 @@ class DB:
         """
         user = self.find_user_by(id=user_id)
         for key, value in kwargs.items():
-            if hasattr(user, key):
+            if hasattr(User, key):
                 setattr(user, key, value)
                 self._session.commit()
             else:
